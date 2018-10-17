@@ -4,13 +4,12 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"os"
 
 	_ "github.com/lib/pq"
 )
 
 const (
-	DB_USER    = "fionwan"
-	DB_NAME    = "todosDB"
 	TABLE_NAME = "todos"
 )
 
@@ -19,7 +18,13 @@ var db *sql.DB
 func InitDB() {
 	var err error
 
-	dbinfo := fmt.Sprintf("user=%s dbname=%s sslmode=disable", DB_USER, DB_NAME)
+	DB_USER := os.Getenv("DB_USER")
+	DB_NAME := os.Getenv("DB_NAME")
+	DB_PORT := os.Getenv("DB_PORT")
+	DB_HOST := os.Getenv("DB_HOST")
+	DB_PASSWORD := os.Getenv("DB_PASSWORD")
+
+	dbinfo := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s", DB_HOST, DB_PORT, DB_USER, DB_NAME, DB_PASSWORD)
 
 	db, err = sql.Open("postgres", dbinfo)
 	checkErr(err)
