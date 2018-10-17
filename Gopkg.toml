@@ -36,3 +36,7 @@
 [prune]
   go-tests = true
   unused-packages = true
+
+[metadata.heroku]
+  root-package = "github.com/fionwan/todoApp"
+  go-version = "1.8.3"
