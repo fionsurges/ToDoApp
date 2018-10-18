@@ -1,5 +1,5 @@
 # TodoApp 
-Todo app 
+Todo app written in Golang, connects to PostgreSQL database, and includes docker image.
 
 ## Requirements
 Build a Go server side application exposing an API for managing a to do list
