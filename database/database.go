@@ -14,12 +14,12 @@ const (
 )
 
 type DbConnection struct {
-	DbUser string
-	DbName string
-	DbPort string
-	DbHost string
+	DbUser     string
+	DbName     string
+	DbPort     string
+	DbHost     string
 	DbPassword string
-	Conn *sql.DB
+	Conn       *sql.DB
 }
 
 func (db *DbConnection) InitDB() {
@@ -90,7 +90,7 @@ func (db *DbConnection) InsertTodoItem(todo Todo) (added Todo) {
 }
 
 func (db *DbConnection) MarkDone(id string) (todo Todo) {
-	err := db.Conn.QueryRow("update todos set complete=true where id = $1 returning *;", id).Scan(
+	err := db.Conn.QueryRow("update todos set completed=true where id = $1 returning *;", id).Scan(
 		&todo.Id, &todo.Name, &todo.Completed)
 	if err != nil {
 		todo.Id = -1
