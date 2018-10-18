@@ -11,12 +11,66 @@ import (
 	"github.com/gorilla/mux"
 )
 
+type App struct {
+	db     *database.DbConnection
+	Router *mux.Router
+}
+
+func NewApp(db *database.DbConnection) *App {
+	a := App{
+		db: db,
+	}
+
+	routes := Routes{
+		Route{
+			"Index",
+			"GET",
+			"/",
+			Index,
+		},
+		Route{
+			"TodoIndex",
+			"GET",
+			"/todos",
+			a.TodoShow,
+		},
+		Route{
+			"TodoShow",
+			"GET",
+			"/todos/{todoId}",
+			a.TodoIndex,
+		},
+		Route{
+			"TodoCreate",
+			"POST",
+			"/todos",
+			a.TodoCreate,
+		},
+		Route{
+			"TodoDelete",
+			"DELETE",
+			"/todos/{todoId}",
+			a.TodoDelete,
+		},
+		Route{
+			"TodoMarkDone",
+			"PATCH",
+			"/todos/{todoId}",
+			a.TodoMarkDone,
+		},
+	}
+
+	a.Router = NewRouter(routes)
+	return &a
+}
+
 func Index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Welcome!")
 }
 
-func TodoShow(w http.ResponseWriter, r *http.Request) {
-	todos := database.GetTodoList()
+func (a *App) TodoShow(w http.ResponseWriter, r *http.Request) {
+
+	todos := a.db.GetTodoList()
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
@@ -26,11 +80,11 @@ func TodoShow(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func TodoIndex(w http.ResponseWriter, r *http.Request) {
+func (a *App) TodoIndex(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	todoId := vars["todoId"]
 
-	res := database.GetTodoItem(todoId)
+	res := a.db.GetTodoItem(todoId)
 	if res.Id == -1 {
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
@@ -40,11 +94,11 @@ func TodoIndex(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func TodoMarkDone(w http.ResponseWriter, r *http.Request) {
+func (a *App) TodoMarkDone(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	todoId := vars["todoId"]
 
-	res := database.MarkDone(todoId)
+	res := a.db.MarkDone(todoId)
 	if res.Id == -1 {
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
@@ -58,11 +112,11 @@ func TodoMarkDone(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func TodoDelete(w http.ResponseWriter, r *http.Request) {
+func (a *App) TodoDelete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	todoId := vars["todoId"]
 
-	res := database.DeleteTodoItem(todoId)
+	res := a.db.DeleteTodoItem(todoId)
 	if res == -1 {
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
@@ -70,7 +124,7 @@ func TodoDelete(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func TodoCreate(w http.ResponseWriter, r *http.Request) {
+func (a *App) TodoCreate(w http.ResponseWriter, r *http.Request) {
 	var todo database.Todo
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
@@ -91,7 +145,7 @@ func TodoCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	t := database.InsertTodoItem(todo)
+	t := a.db.InsertTodoItem(todo)
 	if t.Id == -1 {
 		w.WriteHeader(500)
 		return

@@ -13,28 +13,45 @@ const (
 	TABLE_NAME = "todos"
 )
 
-var db *sql.DB
+type DbConnection struct {
+	DbUser string
+	DbName string
+	DbPort string
+	DbHost string
+	DbPassword string
+	Conn *sql.DB
+}
 
-func InitDB() {
+func (db *DbConnection) InitDB() {
 	var err error
 
-	DB_USER := os.Getenv("DB_USER")
-	DB_NAME := os.Getenv("DB_NAME")
-	DB_PORT := os.Getenv("DB_PORT")
-	DB_HOST := os.Getenv("DB_HOST")
-	DB_PASSWORD := os.Getenv("DB_PASSWORD")
+	if db.DbUser == "" {
+		db.DbUser = os.Getenv("DB_USER")
+	}
+	if db.DbName == "" {
+		db.DbName = os.Getenv("DB_NAME")
+	}
+	if db.DbPort == "" {
+		db.DbPort = os.Getenv("DB_PORT")
+	}
+	if db.DbHost == "" {
+		db.DbHost = os.Getenv("DB_HOST")
+	}
+	if db.DbPassword == "" {
+		db.DbPassword = os.Getenv("DB_PASSWORD")
+	}
 
-	dbinfo := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s", DB_HOST, DB_PORT, DB_USER, DB_NAME, DB_PASSWORD)
+	dbinfo := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s", db.DbHost, db.DbPort, db.DbUser, db.DbName, db.DbPassword)
 
-	db, err = sql.Open("postgres", dbinfo)
+	db.Conn, err = sql.Open("postgres", dbinfo)
 	checkErr(err)
 	fmt.Println("DB connection should be live")
 }
 
-func GetTodoList() (todos Todos) {
+func (db *DbConnection) GetTodoList() (todos Todos) {
 	var temp Todo
 
-	rows, err := db.Query("select * from todos;")
+	rows, err := db.Conn.Query("select * from todos;")
 	checkErr(err)
 
 	for rows.Next() {
@@ -44,8 +61,8 @@ func GetTodoList() (todos Todos) {
 	return todos
 }
 
-func GetTodoItem(id string) (todo Todo) {
-	err := db.QueryRow("select * from todos where id = $1;", id).Scan(&todo.Id, &todo.Name, &todo.Completed)
+func (db *DbConnection) GetTodoItem(id string) (todo Todo) {
+	err := db.Conn.QueryRow("select * from todos where id = $1;", id).Scan(&todo.Id, &todo.Name, &todo.Completed)
 	if err != nil {
 		fmt.Println(err)
 		todo.Id = -1
@@ -53,15 +70,15 @@ func GetTodoItem(id string) (todo Todo) {
 	return todo
 }
 
-func InsertTodoItem(todo Todo) (added Todo) {
-	if db == nil {
+func (db *DbConnection) InsertTodoItem(todo Todo) (added Todo) {
+	if db.Conn == nil {
 		err := errors.New("attempted to insert with no DB connection")
 		LogError(err)
 
 		todo.Id = -1
 		return todo
 	} else {
-		err := db.QueryRow("insert into todos (name, completed) values ($1, $2) returning id;",
+		err := db.Conn.QueryRow("insert into todos (name, completed) values ($1, $2) returning id;",
 			todo.Name, todo.Completed).Scan(&todo.Id)
 		if err != nil {
 			todo.Id = -1
@@ -72,8 +89,8 @@ func InsertTodoItem(todo Todo) (added Todo) {
 	}
 }
 
-func MarkDone(id string) (todo Todo) {
-	err := db.QueryRow("update todos set complete=true where id = $1 returning *;", id).Scan(
+func (db *DbConnection) MarkDone(id string) (todo Todo) {
+	err := db.Conn.QueryRow("update todos set complete=true where id = $1 returning *;", id).Scan(
 		&todo.Id, &todo.Name, &todo.Completed)
 	if err != nil {
 		todo.Id = -1
@@ -82,8 +99,8 @@ func MarkDone(id string) (todo Todo) {
 	return todo
 }
 
-func DeleteTodoItem(id string) (deleted int) {
-	err := db.QueryRow("delete from todos where id = $1 returning id;", id).Scan(&deleted)
+func (db *DbConnection) DeleteTodoItem(id string) (deleted int) {
+	err := db.Conn.QueryRow("delete from todos where id = $1 returning id;", id).Scan(&deleted)
 	if err != nil {
 		LogError(err)
 		return -1

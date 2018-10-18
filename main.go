@@ -23,9 +23,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	database.InitDB()
-	router := handlers.NewRouter()
-	
+	db := &database.DbConnection{}
+	db.InitDB()
+
+	app := handlers.NewApp(db)
+
 	fmt.Println("server listening on port", addr)
-	log.Fatal(http.ListenAndServe(addr, router))
+	log.Fatal(http.ListenAndServe(addr, app.Router))
 }

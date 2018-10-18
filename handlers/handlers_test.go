@@ -1,42 +1,45 @@
 package handlers
 
 import (
-	"net/http"
+	"database/sql"
+	"fmt"
+	"io/ioutil"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gorilla/mux"
-	"github.com/stretchr/testify/assert"
-	// "github.com/fionwan/todoApp/database"
+	"github.com/fionwan/todoApp/database"
 )
 
-func Router() *mux.Router {
-	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/", TodoShow).Methods("GET")
+func Test_TodoShow(t *testing.T) {
+	request := httptest.NewRequest("GET", "/todos", nil)
+	w := httptest.NewRecorder()
 
-	for _, route := range routes {
-		var handler http.Handler
-		handler = route.HandlerFunc
-
-		router.
-			Methods(route.Method).
-			Path(route.Pattern).
-			Name(route.Name).
-			Handler(handler)
+	testdb := database.DbConnection{
+		DbUser: "fionwan",
+		DbName: "todosDB",
+		DbPort: "5432",
+		DbHost: "localhost",
 	}
 
-	return router
-}
+	dbinfo := fmt.Sprintf("sslmode=disable host=%s port=%s user=%s dbname=%s password=''", testdb.DbHost, testdb.DbPort, testdb.DbUser, testdb.DbName)
+	testdb.Conn, _ = sql.Open("postgres", dbinfo)
 
-// func Router() *mux.Router {
-// 	router := mux.NewRouter()
-// 	router.HandleFunc("/", TodoShow).Methods("GET")
-// 	return router
-// }
+	testTodo := database.Todo{
+		Name:      "test",
+		Completed: false,
+	}
 
-func TestTodoShow(t *testing.T) {
-	request, _ := http.NewRequest("GET", "/todos", nil)
-	response := httptest.NewRecorder()
-	Router().ServeHTTP(response, request)
-	assert.Equal(t, 200, response.Code, "OK response is expected")
+	testdb.InsertTodoItem(testTodo)
+
+	testapp := App{
+		db: &testdb,
+	}
+
+	testapp.TodoShow(w, request)
+
+	resp := w.Result()
+	body, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println(string(body))
+
+	testdb.Conn.QueryRow("delete * from todos;")
 }

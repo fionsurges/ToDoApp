@@ -33,3 +33,8 @@ Deployed server [here]("https://to-do-app-fion.herokuapp.com/")
 
 #### Run application 
 `./todoApp`
+
+### Run Test
+`cd /handlers`\
+`psql todosDB < ./migrations.sql`\
+`go test`
