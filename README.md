@@ -37,5 +37,6 @@ Deployed server [here](https://to-do-app-fion.herokuapp.com/)
 
 ### Run Test
 `cd /handlers`\
+`psql create database todosDB;`
 `psql todosDB < ./migrations.sql`\
 `go test`
