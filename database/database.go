@@ -99,6 +99,16 @@ func (db *DbConnection) MarkDone(id string) (todo Todo) {
 	return todo
 }
 
+func (db *DbConnection) ChangeTodo(name, id string) (todo Todo) {
+	err := db.Conn.QueryRow("update todos SET name = $1 where id = $2 returning *;", name, id).Scan(
+		&todo.Id, &todo.Name, &todo.Completed)
+	if err != nil {
+		todo.Id = -1
+		LogError(err)
+	}
+	return todo
+}
+
 func (db *DbConnection) DeleteTodoItem(id string) (deleted int) {
 	err := db.Conn.QueryRow("delete from todos where id = $1 returning id;", id).Scan(&deleted)
 	if err != nil {

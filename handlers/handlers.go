@@ -53,9 +53,15 @@ func NewApp(db *database.DbConnection) *App {
 			a.TodoDelete,
 		},
 		Route{
-			"TodoMarkDone",
+			"TodoEdit",
 			"PATCH",
 			"/todos/{todoId}",
+			a.TodoEdit,
+		},
+		Route{
+			"TodoMarkDone",
+			"PATCH",
+			"/todos/{todoId}/done",
 			a.TodoMarkDone,
 		},
 	}
@@ -112,6 +118,43 @@ func (a *App) TodoMarkDone(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (a *App) TodoEdit(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	todoId := vars["todoId"]
+    
+    var todo database.Todo
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+	if err != nil {
+		panic(err)
+	}
+	defer r.Body.Close()
+	if err := json.Unmarshal(body, &todo); err != nil {
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(422)
+		database.LogError(err)
+
+		if err := json.NewEncoder(w).Encode(err); err != nil {
+			panic(err)
+		}
+
+		return
+	}
+
+    res := a.db.ChangeTodo(todo.Name, todoId)
+    
+	if res.Id == -1 {
+		w.WriteHeader(http.StatusInternalServerError)
+	} else {
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(http.StatusOK)
+
+		if err := json.NewEncoder(w).Encode(res); err != nil {
+			panic(err)
+		}
+
+	}
+}
+
 func (a *App) TodoDelete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	todoId := vars["todoId"]
@@ -130,9 +173,7 @@ func (a *App) TodoCreate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	if err := r.Body.Close(); err != nil {
-		panic(err)
-	}
+	defer r.Body.Close()
 	if err := json.Unmarshal(body, &todo); err != nil {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(422)
