@@ -1,35 +1,35 @@
 # TodoApp 
 Todo app 
 
-### Requirements
+## Requirements
 Build a Go server side application exposing an API for managing a to do list
 
-### Usage
+## Usage
 * GET "/" displays welcome page of deployed server
 * GET "/todos" displays list of todos
 * POST "/todos" adds a new todo item to the list
 * DELETE "/todos/:id" deletes the todo item by the id
 * PUT "/todos/:id" Updates any edits on a todo item by id
 
-### Deployment
+## Deployment
 
-## Heroku
+### Heroku
 Deployed server [here]("https://to-do-app-fion.herokuapp.com/")
 
-## Docker
+### Docker
 
-# Clone and get repo
+#### Clone and get repo
 `go get -d github.com/fionwan/todoApp`
 `cd $GOPATH/src/github.com/fionwan/todoApp`
 
-# Build Docker image
+#### Build Docker image
 `docker build -t todoapp .`
 
-# Run Docker image
+#### Run Docker image
 `docker run -it todoapp`
 
-# Build application
+#### Build application
 `go build`
 
-# Run application 
+#### Run application 
 `./todoApp`
