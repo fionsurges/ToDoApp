@@ -19,7 +19,7 @@ Deployed server [here]("https://to-do-app-fion.herokuapp.com/")
 ### Docker
 
 #### Clone and get repo
-`go get -d github.com/fionwan/todoApp`
+`go get -d github.com/fionwan/todoApp`\
 `cd $GOPATH/src/github.com/fionwan/todoApp`
 
 #### Build Docker image
