@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/fionwan/todoApp/database"
+	"github.com/fionwan/todoApp/handlers"
 )
 
 func determineListenAddress() (string, error) {
@@ -23,8 +24,8 @@ func main() {
 		log.Fatal(err)
 	}
 	database.InitDB()
-	router := database.NewRouter()
-
+	router := handlers.NewRouter()
+	
 	fmt.Println("server listening on port", addr)
 	log.Fatal(http.ListenAndServe(addr, router))
 }

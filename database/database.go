@@ -102,14 +102,3 @@ func checkErr(err error) {
 func LogError(err error) {
 	fmt.Println(err.Error())
 }
-
-// func TodoDelete(w http.ResponseWriter, r *http.Request) {
-// 	vars:= mux.Vars(r)
-// 	todoId := vars[“todoId”]
-// 	res := DeleteTodo(todoId)
-// 	if res == -1 {
-// 		w.WriteHeader(http.StatusInternalServerError)
-// 	} else {
-// 		w.WriteHeader(http.StatusOK)
-// 	}
-// }
