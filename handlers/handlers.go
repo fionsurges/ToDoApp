@@ -22,6 +22,7 @@ func TodoShow(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	if err := json.NewEncoder(w).Encode(todos); err != nil {
+		// fmt.Printf("server not responding %s", err.Error())
 		panic(err)
 	}
 }
