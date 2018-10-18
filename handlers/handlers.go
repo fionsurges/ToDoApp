@@ -121,8 +121,8 @@ func (a *App) TodoMarkDone(w http.ResponseWriter, r *http.Request) {
 func (a *App) TodoEdit(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	todoId := vars["todoId"]
-    
-    var todo database.Todo
+
+	var todo database.Todo
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
 		panic(err)
@@ -140,8 +140,8 @@ func (a *App) TodoEdit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-    res := a.db.ChangeTodo(todo.Name, todoId)
-    
+	res := a.db.ChangeTodo(todo.Name, todoId)
+
 	if res.Id == -1 {
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {

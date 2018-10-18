@@ -41,5 +41,5 @@ func Test_TodoShow(t *testing.T) {
 	body, _ := ioutil.ReadAll(resp.Body)
 	fmt.Println(string(body))
 
-	testdb.Conn.QueryRow("delete * from todos;")
+	testdb.Conn.Query("delete from todos;")
 }
