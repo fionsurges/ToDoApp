@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/fionwan/todoApp/database"
 )
 
 func determineListenAddress() (string, error) {
@@ -20,8 +22,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	InitDB()
-	router := NewRouter()
+	database.InitDB()
+	router := database.NewRouter()
 
 	fmt.Println("server listening on port", addr)
 	log.Fatal(http.ListenAndServe(addr, router))
