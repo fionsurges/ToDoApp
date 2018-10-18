@@ -9,12 +9,13 @@ Build a Go server side application exposing an API for managing a to do list
 * GET "/todos" displays list of todos
 * POST "/todos" adds a new todo item to the list
 * DELETE "/todos/:id" deletes the todo item by the id
-* PUT "/todos/:id" Updates any edits on a todo item by id
+* PATCH "/todos/:id" Updates any edits on a todo item by id
+* PATCH "/todos/:id/done" Updates "completed" field to true
 
 ## Deployment
 
 ### Heroku
-Deployed server [here]("https://to-do-app-fion.herokuapp.com/")
+Deployed server [here](https://to-do-app-fion.herokuapp.com/)
 
 ### Docker
 
