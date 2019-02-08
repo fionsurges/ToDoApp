@@ -82,7 +82,7 @@ func (a *App) TodoShow(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	if err := json.NewEncoder(w).Encode(todos); err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
 }
 
@@ -95,7 +95,7 @@ func (a *App) TodoIndex(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
 		if err := json.NewEncoder(w).Encode(res); err != nil {
-			panic(err)
+			fmt.Println(err)
 		}
 	}
 }
@@ -112,7 +112,7 @@ func (a *App) TodoMarkDone(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 
 		if err := json.NewEncoder(w).Encode(res); err != nil {
-			panic(err)
+			fmt.Println(err)
 		}
 
 	}
@@ -125,7 +125,7 @@ func (a *App) TodoEdit(w http.ResponseWriter, r *http.Request) {
 	var todo database.Todo
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
 	defer r.Body.Close()
 	if err := json.Unmarshal(body, &todo); err != nil {
@@ -134,7 +134,7 @@ func (a *App) TodoEdit(w http.ResponseWriter, r *http.Request) {
 		database.LogError(err)
 
 		if err := json.NewEncoder(w).Encode(err); err != nil {
-			panic(err)
+			fmt.Println(err)
 		}
 
 		return
@@ -149,7 +149,7 @@ func (a *App) TodoEdit(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 
 		if err := json.NewEncoder(w).Encode(res); err != nil {
-			panic(err)
+			fmt.Println(err)
 		}
 
 	}
@@ -171,7 +171,7 @@ func (a *App) TodoCreate(w http.ResponseWriter, r *http.Request) {
 	var todo database.Todo
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
 	defer r.Body.Close()
 	if err := json.Unmarshal(body, &todo); err != nil {
@@ -180,7 +180,7 @@ func (a *App) TodoCreate(w http.ResponseWriter, r *http.Request) {
 		database.LogError(err)
 
 		if err := json.NewEncoder(w).Encode(err); err != nil {
-			panic(err)
+			fmt.Println(err)
 		}
 
 		return
@@ -195,6 +195,6 @@ func (a *App) TodoCreate(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode(t); err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
 }
